@@ -9,6 +9,8 @@ function calRange(min, max, percent) {
   return round2((max - min) * percent + min)
 }
 
+const ticketProduct = 19.9
+
 const goodAndBad = {
   ctr: {
     bad: 0.5,
@@ -19,12 +21,16 @@ const goodAndBad = {
     good: 8,
   },
   cpa: {
-    bad: 40,
-    good: 5,
+    bad: ticketProduct * 1.6,
+    good: ticketProduct * 0.4,
+  },
+  read: {
+    bad: 0.6,
+    good: 0.9,
   },
 }
 
-const funil = ['ctr', 'cpm', 'cpa']
+const funil = ['ctr', 'cpm', 'cpa', 'read']
 
 const filters = [
   'desktop',
@@ -42,21 +48,26 @@ const filters = [
   'stories',
 ]
 
-function getScore() {
-  return Object.fromEntries(
+function getScore(money = 0) {
+  const result = Object.fromEntries(
     funil.map(f => [
       f,
       calRange(goodAndBad[f].bad, goodAndBad[f].good, Math.random()),
     ])
   )
+  const views = (1000 / (result.cpm / money)) * (result.ctr / 100) // * result.read
+  // console.log(views)
+  result['vendas'] = views / result.cpa
+  return result
 }
 
-const getAllMetrics = idName => {
+const getAllMetrics = (idName, money) => {
   seedrandom(idName, { global: true })
 
-  const metrics = Object.fromEntries(filters.map(f => [f, getScore()]))
+  const metrics = Object.fromEntries(filters.map(f => [f, getScore(money)]))
+  metrics['vendas'] = metrics
   // console.log(metrics2)
-  console.log(metrics)
+  // console.log(metrics)
 
   const allToMean = Object.fromEntries(
     funil.map(f => [f, Object.values(metrics).map(item => item[f])])
@@ -104,22 +115,18 @@ function meanJoin(ads, idName) {
   }
 }
 
-const P1 = getAllMetrics('[A-FDF] recife; gosta de futebol')
+const P1 = getAllMetrics('[A-FDF] recife; gosta de futebol', 60)
 
-const A1 = getAllMetrics('[A-FDF] sem botão; cta agressivo')
-const A2 = getAllMetrics('[A-FDF] botão rosa; cta passivo')
-const A3 = getAllMetrics('[A-FDF] botão rosa; sem cta')
+const A1 = getAllMetrics('[A-FDF] sem botão; cta agressivo', 20)
+const A2 = getAllMetrics('[A-FDF] botão rosa; cta passivo', 20)
+const A3 = getAllMetrics('[A-FDF] botão rosa; sem cta', 20)
 
 const newA1 = meanJoin([A1, P1], 'Anuncio a')
 const newA2 = meanJoin([A2, P1], 'Anuncio b')
 const newA3 = meanJoin([A3, P1], 'Anuncio c')
 
-// console.log(A1)
 console.log(newA1)
-
-// console.log(A2)
 console.log(newA2)
-
 console.log(newA3)
 
 console.log(meanJoin([newA1, newA2, newA3], 'Conjunto 1'))
