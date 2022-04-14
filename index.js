@@ -116,18 +116,33 @@ function meanJoin(ads, idName) {
   }
 }
 
-const P1 = getAllMetrics('[A-FDF] recife; gosta de futebol', 60)
+function createConj({ conjName, nameAds }) {
+  const P1 = getAllMetrics(conjName, 60) //'[A-FDF] recife; gosta de futebol', 60)
 
-const A1 = getAllMetrics('[A-FDF] sem botão; cta agressivo', 20)
-const A2 = getAllMetrics('[A-FDF] botão rosa; cta passivo', 20)
-const A3 = getAllMetrics('[A-FDF] botão rosa; sem cta', 20)
+  const ads = nameAds.map(name => getAllMetrics(name, 20))
+  // const A1 = getAllMetrics('[A-FDF] sem botão; cta agressivo', 20)
+  // const A2 = getAllMetrics('[A-FDF] botão rosa; cta passivo', 20)
+  // const A3 = getAllMetrics('[A-FDF] botão rosa; sem cta', 20)
 
-const newA1 = meanJoin([A1, P1], 'Anuncio a')
-const newA2 = meanJoin([A2, P1], 'Anuncio b')
-const newA3 = meanJoin([A3, P1], 'Anuncio c')
+  const newAds = ads.map((ad, id) => meanJoin([ad, P1], `Anuncio ${id}`))
 
-console.log(newA1)
-console.log(newA2)
-console.log(newA3)
+  newAds.forEach(ad => {
+    console.log(ad)
+  })
+  // const newA1 = meanJoin([A1, P1], 'Anuncio a')
+  // const newA2 = meanJoin([A2, P1], 'Anuncio b')
+  // const newA3 = meanJoin([A3, P1], 'Anuncio c')
 
-console.log(meanJoin([newA1, newA2, newA3], 'Conjunto 1'))
+  return meanJoin(newAds, 'Conjunto')
+}
+
+console.log(
+  createConj({
+    conjName: '[A-FDF] recife; gosta de futebol',
+    nameAds: [
+      '[A-FDF] sem botão; cta agressivo',
+      '[A-FDF] botão rosa; cta passivo',
+      '[A-FDF] botão rosa; sem cta',
+    ],
+  })
+)
