@@ -1,5 +1,6 @@
 // const _ = require('lodash')
 var seedrandom = require('seedrandom')
+// const getOscilatron = require('./ocilação-de-tempo')
 
 function round2(num) {
   return parseFloat(num.toFixed(2))
